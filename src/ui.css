@@ -48,12 +48,16 @@
   align-items: center;
   justify-content: center;
   padding: 10px;
-  background-color: #F9F9F9;
+  background: #F9F9F9;
   color: #686868;
   font-size: 16px;
   font-weight: 300;
+  outline:none;
+  border:none;
 }
-.menuItem:active {
+.menuItem:active,
+.menuItem:focus,
+.menuItem.active{
   background-color: #E6ECEF;
   color: #000000;
   font-weight: 500;
