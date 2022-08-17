@@ -1,4 +1,4 @@
-figma.showUI(__html__, { themeColors: false, height: 608, width: 494 });
+figma.showUI(__html__, { themeColors: false, height: 608, width: 506 });
 
 figma.ui.onmessage = (msg) => {
   console.log(msg);
