@@ -30,6 +30,7 @@ import { Button } from "antd";
 import { useState } from "react";
 import { Filters, useFilter } from "./components/useFilter";
 import Loading from "./components/Loading/Loading";
+import IconBtn from "./components/Icon";
 const customStyles = {
   content: {
     width: "60%",
@@ -111,7 +112,7 @@ function App() {
   }, []);
 
   console.log({ loadingAnimate })
-  const onItemPress = async (data, target) => {
+  const onItemPress = async (data) => {
     let res = await axios.get(data.url);
     console.log({ res });
     parent.postMessage(
@@ -265,11 +266,12 @@ function App() {
           <div className="iconsBox">
             {iconOptions.icons.filteredIcons.map((e, i) => {
               return (
-                <img
-                  onClick={(target) => onItemPress(e, target)}
-                  key={i}
-                  src={e.url}
-                  className="icons"
+                <IconBtn
+                  key={i.toString()}
+                  name={e.name}
+                  index={i}
+                  url={e.url}
+                  onItemPress={() => onItemPress(e)}
                 />
               );
             })}
@@ -279,5 +281,8 @@ function App() {
     </div>
   );
 }
+
+
+
 
 ReactDOM.render(<App />, document.getElementById("react-page"));
