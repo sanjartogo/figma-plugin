@@ -1,4 +1,4 @@
-figma.showUI(__html__, { themeColors: true, height: 608, width: 494 });
+figma.showUI(__html__, { themeColors: false, height: 608, width: 494 });
 
 figma.ui.onmessage = (msg) => {
   console.log(msg);
@@ -15,7 +15,7 @@ figma.ui.onmessage = (msg) => {
     // figma.currentPage.appendChild(rect);
     nodes.push(node);
     // }
-    node.resize(100, 100);
+    node.resize(24, 24);
     figma.currentPage.selection = nodes;
     figma.viewport.scrollAndZoomIntoView(nodes);
   }
