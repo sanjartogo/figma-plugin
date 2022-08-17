@@ -1,4 +1,6 @@
+//@ts-ignore
 import * as React from "react";
+//@ts-ignore
 import * as ReactDOM from "react-dom";
 import "./ui.css";
 //@ts-ignore
@@ -14,6 +16,7 @@ import { MoreHorizontal } from "react-feather";
 import { X } from "react-feather";
 // useSearch hook
 import { useSearch } from "./components/useSearch";
+//@ts-ignore
 import axios from "../node_modules/axios/index";
 //@ts-ignore
 import Modal from "react-modal";
@@ -23,8 +26,10 @@ import emailjs from "emailjs-com";
 import Swal from "sweetalert2";
 //@ts-ignore
 import { Button } from "antd";
+//@ts-ignore
 import { useState } from "react";
 import { Filters, useFilter } from "./components/useFilter";
+import Loading from "./components/Loading/Loading";
 const customStyles = {
   content: {
     width: "60%",
@@ -56,8 +61,10 @@ const listFiles = () => { };
 
 function App() {
   const { btnOptions, filters, inputOptions, iconOptions } = useSearch();
+  const [loadingAnimate, setLoadingAnimate] = useState(false)
 
   const getFiles = async (listRef, prefix = "") => {
+    setLoadingAnimate(true)
     try {
       // const pathReference = ref(storage, "activity.svg");
       let res = await listAll(listRef);
@@ -93,6 +100,7 @@ function App() {
         fullIcons: items,
         filteredIcons: items,
       });
+      setLoadingAnimate(false)
     } catch (error) {
       console.log(error);
     }
@@ -102,6 +110,7 @@ function App() {
     effect();
   }, []);
 
+  console.log({ loadingAnimate })
   const onItemPress = async (data, target) => {
     let res = await axios.get(data.url);
     console.log({ res });
@@ -132,6 +141,8 @@ function App() {
 
   async function SendMessage(e: { preventDefault: () => void }) {
     e.preventDefault();
+
+    if (!(message && email)) return;
 
     try {
       const data = await emailjs.sendForm(
@@ -236,7 +247,7 @@ function App() {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  onClick={() => OnButtonClick()}
+                  onClick={() => message && email && OnButtonClick()}
                   loading={loading}
                   className="sendBtn"
                 >
@@ -247,18 +258,24 @@ function App() {
           </Modal>
         </div>
       </div>
-      <div className="iconsBox">
-        {iconOptions.icons.filteredIcons.map((e, i) => {
-          return (
-            <img
-              onClick={(target) => onItemPress(e, target)}
-              key={i}
-              src={e.url}
-              className="icons"
-            />
-          );
-        })}
-      </div>
+      {
+        loadingAnimate ? (
+          <Loading />
+        ) : (
+          <div className="iconsBox">
+            {iconOptions.icons.filteredIcons.map((e, i) => {
+              return (
+                <img
+                  onClick={(target) => onItemPress(e, target)}
+                  key={i}
+                  src={e.url}
+                  className="icons"
+                />
+              );
+            })}
+          </div>
+        )
+      }
     </div>
   );
 }
