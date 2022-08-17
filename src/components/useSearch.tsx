@@ -14,6 +14,7 @@ interface FilterType<V, T> {
   id: V;
   name: T;
   className: T;
+  tag: T;
 }
 
 type FilterTypes = FilterType<number, string>[];
@@ -30,30 +31,49 @@ const initialFilters = [
     id: 0,
     name: "All",
     className: "active",
+    tag: "",
   },
   {
     id: 1,
     name: "Outline",
     className: "",
+    tag: "outline",
   },
   {
     id: 2,
     name: "Doutone",
     className: "",
+    tag: "bulk",
   },
   {
     id: 3,
     name: "Filled",
     className: "",
+    tag: "solid",
   },
 ];
-
 
 export const useSearch = () => {
   const [searchInput, setSearchInput] = React.useState<string>("");
   const [icons, setIcons] =
     React.useState<IconsType<Icon<string>>>(initialIcons);
   const [filters, setFilters] = React.useState<FilterTypes>(initialFilters);
+
+  React.useEffect(() => {
+    let filteredItems = [];
+    let currentFilter = filters.find((e) => e.className === "active").tag;
+    if (!!currentFilter) {
+      filteredItems = icons.fullIcons.filter((e) =>
+        e.name.includes(currentFilter)
+      );
+    } else {
+      filteredItems = icons.fullIcons;
+    }
+    if (!!searchInput) {
+      filteredItems = filteredItems.filter((e) => isHas(e.name, searchInput));
+    }
+    setIcons({ ...icons, filteredIcons: filteredItems });
+  }, [filters, searchInput]);
 
   const isHas = (iconName: string, searchingName: string) => {
     iconName = iconName.replace(/.svg/gi, "").toUpperCase();
@@ -65,12 +85,12 @@ export const useSearch = () => {
   const onChangeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const value = event.currentTarget.value;
     setSearchInput(value);
-    setIcons((prevIcons) => ({
-      ...prevIcons,
-      filteredIcons: prevIcons.fullIcons.filter((icon) =>
-        isHas(icon.name, value)
-      ),
-    }));
+    // setIcons((prevIcons) => ({
+    //   ...prevIcons,
+    //   filteredIcons: prevIcons.fullIcons.filter((icon) =>
+    //     isHas(icon.name, value)
+    //   ),
+    // }));
   };
 
   const onClearInput = () => {

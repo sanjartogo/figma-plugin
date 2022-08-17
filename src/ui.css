@@ -6,7 +6,7 @@
 .searchInput{
  border: none;
  font-size: 20px;
- width: 90%;
+ width: 85%;
  background-color: #F9F9F9 ;
  outline: none;
 
@@ -30,6 +30,8 @@
 }
 .searchIcon {
   color: #28303F;
+  width: 24px;
+  height: 24px;
 }
 .navbar{
   display: flex;
@@ -112,4 +114,67 @@
   stroke-linejoin: round;
   fill: none;
   background-color: pink;
+}
+
+.sendMessage{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.textarea{
+  width: 100%;
+  padding: 5px;
+  margin: 5px 0px;
+  border-radius: 10px;
+  resize: none;
+  outline: none;
+  font-family: sans-serif;
+  border: 1px splid gray;
+}
+
+.input{
+  width: 100%;
+  padding: 5px;
+  margin: 5px 0px;
+  border: none;
+  border: 1px solid gray;
+  outline: none;
+  border-radius: 10px;
+}
+
+.btnBox{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.sendBtn{
+  width: 45%;
+  padding: 5px 15px;
+  margin: 5px 0px;
+  background-color: #E3E6EE;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  transition: .2s ease;
+}
+
+.sendBtn:hover{
+  opacity: .7;
+}
+
+.closeBtn{
+  width: 45%;
+  padding: 5px 15px;
+  margin: 5px 0px;
+  background-color: #E3E6EE;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  transition: .2s ease;
+}
+
+.closeBtn:hover {
+  opacity: .7;
 }

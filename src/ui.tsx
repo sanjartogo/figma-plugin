@@ -12,9 +12,30 @@ import { isAbsolute } from "path/posix";
 import { MoreHorizontal } from "react-feather";
 //@ts-ignore
 import { X } from "react-feather";
-
 // useSearch hook
 import { useSearch } from "./components/useSearch";
+import axios from "../node_modules/axios/index";
+//@ts-ignore
+import Modal from "react-modal";
+//@ts-ignore
+import emailjs from "emailjs-com";
+//@ts-ignore
+import Swal from "sweetalert2";
+//@ts-ignore
+import { Button } from "antd";
+import { useState } from "react";
+import { Filters, useFilter } from "./components/useFilter";
+const customStyles = {
+  content: {
+    width: "60%",
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
 
 const firebaseConfig = {
   apiKey: "AIzaSyD4Cn954HI8TQgvLAG7ldIhbYK5xE8arZ4",
@@ -29,56 +50,124 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const firebaseApp = app;
 const storage = getStorage(firebaseApp, "gs://icons-e8482.appspot.com");
-const listRef = ref(storage, "");
+const rootListRef = ref(storage, "");
 
-declare function require(path: string): any;
+const listFiles = () => {};
 
 function App() {
-  const {
-    btnOptions,
-    filters,
-    inputOptions,
-    iconOptions
-    } = useSearch();
+  const { btnOptions, filters, inputOptions, iconOptions } = useSearch();
 
-  const getFiles = async () => {
+  const getFiles = async (listRef, prefix = "") => {
     try {
       // const pathReference = ref(storage, "activity.svg");
       let res = await listAll(listRef);
+      if (!!res.prefixes.length) {
+        let r = res.prefixes.map((e) => {
+          let path = prefix + e._location.path;
+          return getFiles(e, path);
+        });
+        return await Promise.all(r);
+      }
       let items = await Promise.all(
-        res.items.flat().map(async (el) => {
-          return {
-            url: await getDownloadURL(el),
-            name: el.name,
-          };
-        })
+        res.items
+          .flat()
+          .filter((e, i) => i < 10)
+          .map(async (el) => {
+            return {
+              url: await getDownloadURL(el),
+              name: prefix + "/" + el.name,
+            };
+          })
       );
-      console.log(res);
-      iconOptions.setIcons({
-        fullIcons: items,
-        filteredIcons: items,
-      });
+      return items;
     } catch (error) {
       console.log({ error });
     }
   };
 
+  const effect = async () => {
+    try {
+      let items = (await getFiles(rootListRef)).flat(3);
+      console.log({ items });
+      iconOptions.setIcons({
+        fullIcons: items,
+        filteredIcons: items,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   React.useEffect(() => {
-    getFiles();
+    effect();
   }, []);
 
   const onItemPress = async (data, target) => {
-    console.log({ target });
-    console.log({ t: target.target.innerHTML });
-    console.log({ d: target.target.textContent });
-    let res = await fetch(data, { mode: "no-cors" });
-    console.log({ res: await res.text() });
-    //@ts-ignore
-    // console.log({ res: res.body.text() });
-    console.log({ res: res });
-
-    parent.postMessage({ pluginMessage: { type: "insert_icon", data } }, "*");
+    let res = await axios.get(data.url);
+    console.log({ res });
+    parent.postMessage(
+      { pluginMessage: { type: "insert_icon", data: res.data } },
+      "*"
+    );
   };
+
+  let subtitle;
+  const [modalIsOpen, setIsOpen] = React.useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  function afterOpenModal() {
+    // references are now sync'd and can be accessed.
+    subtitle.style.color = "#f00";
+  }
+
+  const [message, setMessage] = useState("")
+  const [email, setEmail] = useState("")
+
+  async function SendMessage(e: { preventDefault: () => void }) {
+    e.preventDefault();
+
+    try {
+      const data = await emailjs.sendForm(
+        "service_w62mxye",
+        "template_kca82ts",
+        //@ts-ignore
+        e.target,
+        "MRw0SKfM-RnYWqYjk"
+      );
+      const status = await data.status;
+      if (status === 200) {
+        Swal.fire("Succes");
+        setMessage("");
+        setEmail("");
+      }
+    } catch (error) {
+      Swal.fire("Error");
+    }
+  }
+  const [loading, setLoading] = useState(false);
+
+  const OnButtonClick = () => {
+    setLoading(true);
+    const timeOutFunc = () => {
+      setLoading(false);
+    };
+    setTimeout(timeOutFunc, 3000);
+    clearTimeout(3000);
+  };
+
+  const onChangeHandler = (event:React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const {name, value} = event.currentTarget
+    
+    if(name === 'email') setEmail(value)
+    if(name === 'message') setMessage(value)
+  }
 
   return (
     <div className="container">
@@ -112,7 +201,50 @@ function App() {
           })}
         </div>
         <div className="feedbackIcon">
-          <MoreHorizontal />
+          <MoreHorizontal onClick={openModal} style={{ cursor: "pointer" }} />
+          <Modal
+            isOpen={modalIsOpen}
+            onAfterOpen={afterOpenModal}
+            onRequestClose={closeModal}
+            style={customStyles}
+            contentLabel="Example Modal"
+          >
+            <form className="sendMessage" onSubmit={SendMessage}>
+              <textarea
+                className="textarea"
+                placeholder="Enter your comment"
+                rows={8}
+                cols={50}           
+                id="message"
+                name="message"
+                value={message}
+                onChange={onChangeHandler}
+              />
+              <input
+                type="email"
+                id="email"
+                value={email}
+                className="input"
+                placeholder="Your email"
+                name="email"
+                onChange={onChangeHandler}
+              />
+              <div className="btnBox">
+                <button className="closeBtn" onClick={closeModal}>
+                  Cancel
+                </button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  onClick={() => OnButtonClick()}
+                  loading={loading}
+                  className="sendBtn"
+                >
+                  Send
+                </Button>
+              </div>
+            </form>
+          </Modal>
         </div>
       </div>
       <div className="iconsBox">
