@@ -52,7 +52,7 @@ const firebaseApp = app;
 const storage = getStorage(firebaseApp, "gs://icons-e8482.appspot.com");
 const rootListRef = ref(storage, "");
 
-const listFiles = () => {};
+const listFiles = () => { };
 
 function App() {
   const { btnOptions, filters, inputOptions, iconOptions } = useSearch();
@@ -162,11 +162,11 @@ function App() {
     clearTimeout(3000);
   };
 
-  const onChangeHandler = (event:React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {name, value} = event.currentTarget
-    
-    if(name === 'email') setEmail(value)
-    if(name === 'message') setMessage(value)
+  const onChangeHandler = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.currentTarget
+
+    if (name === 'email') setEmail(value)
+    if (name === 'message') setMessage(value)
   }
 
   return (
@@ -214,7 +214,7 @@ function App() {
                 className="textarea"
                 placeholder="Enter your comment"
                 rows={8}
-                cols={50}           
+                cols={50}
                 id="message"
                 name="message"
                 value={message}

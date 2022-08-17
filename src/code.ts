@@ -15,10 +15,10 @@ figma.ui.onmessage = (msg) => {
     // figma.currentPage.appendChild(rect);
     nodes.push(node);
     // }
-    node.resize(200, 200);
+    node.resize(100, 100);
     figma.currentPage.selection = nodes;
     figma.viewport.scrollAndZoomIntoView(nodes);
   }
 
- 
+
 };
