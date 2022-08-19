@@ -8,7 +8,6 @@ interface IconBtnProps {
 }
 
 const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
-    const [isHover, setIsHover] = React.useState(false)
     name = name.split("/").pop().split(".svg").join("")
 
     const isRight = (index + 1) % 6 === 0
@@ -22,25 +21,21 @@ const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
     }
 
     const animatedStyle = {
-        transform: `translateY(-17px) translateX(${isCenter ? "-50%" : "0"})`,
+        transform: `translateY(48px) translateX(${isCenter ? "-50%" : "0"})`,
         width: `calc(${7 * name.length}px)`,
         ...renderPosition()
     }
 
-    const onMouseMoveHandler = () => setIsHover(true)
-
-    const onMouseOutHandler = () => setIsHover(false)
-
     return (
-        <div className="icon__box" onMouseMove={onMouseMoveHandler} onMouseOut={onMouseOutHandler}>
+        <div className="icon__box">
             <img
                 onClick={() => onItemPress && onItemPress()}
                 src={url}
                 className="icons"
-                
+
             />
 
-            <p className={`icon__title ${isHover && "active"}`} style={animatedStyle}>
+            <p className={`icon__title`} style={animatedStyle}>
                 <small>
                     {name}
                 </small>

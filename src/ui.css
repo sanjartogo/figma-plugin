@@ -110,11 +110,12 @@
 
 .header_modal--headerModalTitleWithoutOverflow--1rTCG .header_modal--headerModalTitle--8hnpX {
   font-weight: 900;
-    font-size: 14px;
-    line-height: 1.2;
+  font-size: 14px;
+  line-height: 1.2;
 }
-.draggable_modal--header--PzIrk  .header_modal--header--c8kL6{
-  background:#444444 !important; 
+
+.draggable_modal--header--PzIrk .header_modal--header--c8kL6 {
+  background: #444444 !important;
 }
 
 .all {
@@ -124,7 +125,7 @@
 }
 
 .loading__title {
-  color:rgba(0, 0, 0, 0.6);
+  color: rgba(0, 0, 0, 0.6);
   margin-top: 14px;
   font-size: 20px;
   font-family: sans-serif;
@@ -153,25 +154,30 @@
 
 .icon__box {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 69px;
+  border: 1px solid transparent;
+  background-color: #F7F7F7;
 }
 
-.icon__title.active {
+.icon__box:hover {
+  background-color: #fff;
+  border: 1px solid #F7F7F7;
+}
+
+.icon__box:hover .icon__title {
   display: block;
 }
 
 .icons {
   width: 30px;
   height: 30px;
-  background-color: #F7F7F7;
-  /* padding: 25px; */
-  transition: .2s ease;
-  border: 1px solid transparent;
 }
 
-.icons:hover {
-  background-color: #fff;
-  border: 1px solid #F7F7F7;
-}
+
 
 .feather {
   width: 24px;
@@ -226,7 +232,7 @@
   border: none;
   border-radius: 10px;
   transition: .2s ease;
-  color:white;
+  color: white;
 }
 
 .sendBtn:hover {
