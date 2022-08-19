@@ -58,14 +58,14 @@ const firebaseApp = app;
 const storage = getStorage(firebaseApp, "gs://icons-e8482.appspot.com");
 const rootListRef = ref(storage, "");
 
-const listFiles = () => { };
+const listFiles = () => {};
 
 function App() {
   const { btnOptions, filters, inputOptions, iconOptions } = useSearch();
-  const [loadingAnimate, setLoadingAnimate] = useState(false)
+  const [loadingAnimate, setLoadingAnimate] = useState(false);
 
   const getFiles = async (listRef, prefix = "") => {
-    setLoadingAnimate(true)
+    setLoadingAnimate(true);
     try {
       // const pathReference = ref(storage, "activity.svg");
       let res = await listAll(listRef);
@@ -79,7 +79,6 @@ function App() {
       let items = await Promise.all(
         res.items
           .flat()
-          .filter((e, i) => i < 10)
           .map(async (el) => {
             return {
               url: await getDownloadURL(el),
@@ -101,17 +100,24 @@ function App() {
         fullIcons: items,
         filteredIcons: items,
       });
-      setLoadingAnimate(false)
+      setLoadingAnimate(false);
     } catch (error) {
       console.log(error);
     }
   };
 
   React.useEffect(() => {
+    const navbar = document.querySelector(
+      ".header_modal--headerModalTitleWithoutOverflow--1rTCG .header_modal--headerModalTitle--8hnpX"
+    ) as HTMLDivElement;
     effect();
+
+    if (navbar) {
+      navbar.style.backgroundColor = "#444";
+    }
   }, []);
 
-  console.log({ loadingAnimate })
+  console.log({ loadingAnimate });
   const onItemPress = async (data) => {
     let res = await axios.get(data.url);
     console.log({ res });
@@ -137,8 +143,8 @@ function App() {
     subtitle.style.color = "#f00";
   }
 
-  const [message, setMessage] = useState("")
-  const [email, setEmail] = useState("")
+  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
 
   async function SendMessage(e: { preventDefault: () => void }) {
     e.preventDefault();
@@ -174,12 +180,14 @@ function App() {
     clearTimeout(3000);
   };
 
-  const onChangeHandler = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = event.currentTarget
+  const onChangeHandler = (
+    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.currentTarget;
 
-    if (name === 'email') setEmail(value)
-    if (name === 'message') setMessage(value)
-  }
+    if (name === "email") setEmail(value);
+    if (name === "message") setMessage(value);
+  };
 
   return (
     <div className="container">
@@ -188,7 +196,11 @@ function App() {
         <input
           type="text"
           className="searchInput"
-          placeholder="Search"
+          placeholder={`Search ${
+            iconOptions.icons.fullIcons.length > 0
+              ? `${iconOptions.icons.fullIcons.length} icons`
+              : ""
+          }`}
           value={inputOptions.searchInput}
           onChange={inputOptions.onChangeInput}
         />
@@ -224,7 +236,7 @@ function App() {
             <form className="sendMessage" onSubmit={SendMessage}>
               <textarea
                 className="textarea"
-                placeholder="Enter your comment"
+                placeholder="Send us your feedback to improve"
                 rows={8}
                 cols={50}
                 id="message"
@@ -252,37 +264,32 @@ function App() {
                   loading={loading}
                   className="sendBtn"
                 >
-                  Send
+                  Submit
                 </Button>
               </div>
             </form>
           </Modal>
         </div>
       </div>
-      {
-        loadingAnimate ? (
-          <Loading />
-        ) : (
-          <div className="iconsBox">
-            {iconOptions.icons.filteredIcons.map((e, i) => {
-              return (
-                <IconBtn
-                  key={i.toString()}
-                  name={e.name}
-                  index={i}
-                  url={e.url}
-                  onItemPress={() => onItemPress(e)}
-                />
-              );
-            })}
-          </div>
-        )
-      }
+      {loadingAnimate ? (
+        <Loading />
+      ) : (
+        <div className="iconsBox">
+          {iconOptions.icons.filteredIcons.map((e, i) => {
+            return (
+              <IconBtn
+                key={i.toString()}
+                name={e.name}
+                index={i}
+                url={e.url}
+                onItemPress={() => onItemPress(e)}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
-
-
-
 
 ReactDOM.render(<App />, document.getElementById("react-page"));

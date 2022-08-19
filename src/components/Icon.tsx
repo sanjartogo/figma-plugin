@@ -37,6 +37,7 @@ const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
                 onClick={() => onItemPress && onItemPress()}
                 src={url}
                 className="icons"
+                
             />
 
             <p className={`icon__title ${isHover && "active"}`} style={animatedStyle}>
