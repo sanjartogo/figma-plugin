@@ -62,13 +62,17 @@ const rootListRef = ref(storage, "");
 
 const listFiles = () => {};
 
+
+// let url = "http://localhost:3001";
+let url = "https://figma-plugin.herokuapp.com"
+
 function App() {
   const { btnOptions, filters, inputOptions, iconOptions } = useSearch();
   const [loadingAnimate, setLoadingAnimate] = useState(false);
 
   const [page, setPage] = useState(0);
 
-  const [icons, setIcons] = useState([]);
+  const [icons, setIcons] = useState({ icons: [], count: 0 });
 
   // const getFiles = async (listRef, prefix = "") => {
   //   setLoadingAnimate(true);
@@ -100,7 +104,7 @@ function App() {
     let activeFilter = filters.find((e) => e.className === "active") || "";
     if (!!activeFilter) {
       setPage(0);
-      setIcons([]);
+      setIcons({ icons: [], count: 0 });
       fetchFiles();
     }
   }, [filters]);
@@ -109,9 +113,9 @@ function App() {
     let activeFilter = filters.find((e) => e.className === "active");
     try {
       let items = await axios.get(
-        `https://figma-plugin.herokuapp.com?page=${page}&pageSize=100&filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
+        `${url}?page=${page}&pageSize=100&filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
       );
-      setIcons((e) => [...e, ...items.data]);
+      setIcons((el) => ({ ...el, ...items.data }));
       setPage((e) => e + 1);
     } catch (error) {}
   };
@@ -122,10 +126,10 @@ function App() {
     inputOptions.onChangeInput(e);
   }, 1000);
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     setPage(0);
     fetchFiles();
-  },[inputOptions.searchInput])
+  }, [inputOptions.searchInput]);
 
   React.useEffect(() => {
     const navbar = document.querySelector(
@@ -220,9 +224,7 @@ function App() {
         <input
           type="text"
           className="searchInput"
-          placeholder={`Search ${
-            icons.length > 0 ? `${icons.length} icons` : ""
-          }`}
+          placeholder={`Search ${!!icons.count ? `${icons.count} icons` : ""}`}
           value={inputOptions.searchInput}
           onChange={debouncedInputChange}
         />
@@ -313,18 +315,18 @@ function App() {
       <div ref={loader}></div> */}
       <InfiniteScroll
         hasMore={true}
-        dataLength={icons.length}
+        dataLength={icons.count}
         loader={Loading}
         next={throttledFetch}
       >
         <div className="iconsBox">
-          {icons.map((e, i) => {
+          {icons.icons.map((e, i) => {
             return (
               <IconBtn
                 key={i.toString()}
                 name={e.name}
                 index={i}
-                url={`http://localhost:3001/static/${e.path}`}
+                url={`${url}/static/${e.path}`}
                 onItemPress={() => onItemPress(e)}
               />
             );
