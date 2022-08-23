@@ -64,14 +64,16 @@ const baseUrl = "https://figma-plugin.herokuapp.com"
 
 const listFiles = () => { };
 
+
+// let url = "http://localhost:3001";
+let url = "https://figma-plugin.herokuapp.com"
+
 function App() {
-  const { btnOptions, filters, inputOptions, iconOptions } = useSearch();
-  const [loadingAnimate, setLoadingAnimate] = useState(false);
-  const [iconsCount, setIconsCount] = useState(0)
+  const { btnOptions, filters, inputOptions } = useSearch();
 
   const [page, setPage] = useState(0);
 
-  const [icons, setIcons] = useState([]);
+  const [icons, setIcons] = useState({ icons: [], count: 0 });
 
   // const getFiles = async (listRef, prefix = "") => {
   //   setLoadingAnimate(true);
@@ -103,7 +105,7 @@ function App() {
     let activeFilter = filters.find((e) => e.className === "active") || "";
     if (!!activeFilter) {
       setPage(0);
-      setIcons([]);
+      setIcons({ icons: [], count: 0 });
       fetchFiles();
     }
   }, [filters]);
@@ -114,9 +116,8 @@ function App() {
       let items = await axios.get(
         `${baseUrl}?page=${page}&pageSize=100&filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
       );
-      setIcons((e) => [...e, ...items.data.icons]);
+      setIcons((e) => ({ ...e, icons: [...e.icons, ...items.data.icons], count: items.data.count }));
       setPage((e) => e + 1);
-      setIconsCount(() => items.data.count)
     } catch (error) { }
   };
 
@@ -126,12 +127,8 @@ function App() {
       let items = await axios.get(
         `${baseUrl}?search=${inputOptions.searchInput}`
       );
-      if (!!inputOptions.searchInput) {
-        items = await axios.get(
-          `${baseUrl}?search=${inputOptions.searchInput}`
-        );
-      }
-      setIcons(() => items.data.icons);
+
+      setIcons(icons => ({ ...icons, icons: items.data.icons }));
     } catch (error) { }
   }, [inputOptions.searchInput])
 
@@ -140,16 +137,6 @@ function App() {
   }, [inputOptions.searchInput])
 
   const throttledFetch = _.throttle(fetchFiles, 1000);
-
-  // const debouncedInputChange = _.debounce((e) => {
-  //   console.log("e", e)
-  //   inputOptions.onChangeInput(e);
-  // }, 1000);
-
-  // React.useEffect(() => {
-  //   setPage(0);
-  //   fetchFiles();
-  // }, [inputOptions.searchInput])
 
   React.useEffect(() => {
     const navbar = document.querySelector(
@@ -215,7 +202,6 @@ function App() {
     }
   }
 
-  const loader = React.useRef(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -245,7 +231,7 @@ function App() {
         <input
           type="text"
           className="searchInput"
-          placeholder={`Search ${iconsCount} icons`}
+          placeholder={`Search ${icons.count} icons`}
           value={inputOptions.searchInput}
           onChange={inputOptions.onChangeInput}
         />
@@ -336,12 +322,12 @@ function App() {
       <div ref={loader}></div> */}
       <InfiniteScroll
         hasMore={true}
-        dataLength={icons.length}
+        dataLength={icons.count}
         loader={Loading}
         next={throttledFetch}
       >
         <div className="iconsBox">
-          {icons.map((e, i) => {
+          {icons.icons.map((e, i) => {
             return (
               <IconBtn
                 key={i.toString()}

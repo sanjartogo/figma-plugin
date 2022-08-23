@@ -140,6 +140,7 @@
   /* grid-column-gap: 4px; */
   position: relative;
   box-sizing: border-box;
+  padding-bottom: 2rem;
 }
 
 .icon__title {
