@@ -110,31 +110,44 @@ function App() {
     }
   }, [filters]);
 
+  React.useEffect(() => {
+    (async function () {
+      try {
+        const res = await axios.get(baseUrl)
+        const count = await res.data.count
+        setIcons(icons => ({ ...icons, count }))
+      } catch (error) {
+
+      }
+    })()
+  }, [])
+
   const fetchFiles = async () => {
     let activeFilter = filters.find((e) => e.className === "active");
     try {
       let items = await axios.get(
         `${baseUrl}?page=${page}&pageSize=100&filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
       );
-      setIcons((e) => ({ ...e, icons: [...e.icons, ...items.data.icons], count: items.data.count }));
+      setIcons((e) => ({ ...e, icons: [...e.icons, ...items.data.icons] }));
       setPage((e) => e + 1);
     } catch (error) { }
   };
 
 
-  const searchFiles = React.useCallback(async () => {
+  const searchFiles = async () => {
+    let activeFilter = filters.find((e) => e.className === "active");
     try {
       let items = await axios.get(
-        `${baseUrl}?search=${inputOptions.searchInput}`
+        `${baseUrl}?filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
       );
 
       setIcons(icons => ({ ...icons, icons: items.data.icons }));
     } catch (error) { }
-  }, [inputOptions.searchInput])
+  };
 
   React.useEffect(() => {
     searchFiles()
-  }, [inputOptions.searchInput])
+  }, [inputOptions.searchInput, filters])
 
   const throttledFetch = _.throttle(fetchFiles, 1000);
 
