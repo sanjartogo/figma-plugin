@@ -27,6 +27,7 @@ import Swal from "sweetalert2";
 import { Button } from "antd";
 //@ts-ignore
 import { useState } from "react";
+//@ts-ignore
 import InfiniteScroll from "../node_modules/react-infinite-scroll-component/dist/index";
 import IconBtn from "./components/Icon";
 import Loading from "./components/Loading/Loading";
@@ -59,12 +60,14 @@ const app = initializeApp(firebaseConfig);
 const firebaseApp = app;
 const storage = getStorage(firebaseApp, "gs://icons-e8482.appspot.com");
 const rootListRef = ref(storage, "");
+const baseUrl = "https://figma-plugin.herokuapp.com"
 
-const listFiles = () => {};
+const listFiles = () => { };
 
 function App() {
   const { btnOptions, filters, inputOptions, iconOptions } = useSearch();
   const [loadingAnimate, setLoadingAnimate] = useState(false);
+  const [iconsCount, setIconsCount] = useState(0)
 
   const [page, setPage] = useState(0);
 
@@ -109,23 +112,44 @@ function App() {
     let activeFilter = filters.find((e) => e.className === "active");
     try {
       let items = await axios.get(
-        `https://figma-plugin.herokuapp.com?page=${page}&pageSize=100&filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
+        `${baseUrl}?page=${page}&pageSize=100&filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
       );
-      setIcons((e) => [...e, ...items.data]);
+      setIcons((e) => [...e, ...items.data.icons]);
       setPage((e) => e + 1);
-    } catch (error) {}
+      setIconsCount(() => items.data.count)
+    } catch (error) { }
   };
+
+
+  const searchFiles = React.useCallback(async () => {
+    try {
+      let items = await axios.get(
+        `${baseUrl}?search=${inputOptions.searchInput}`
+      );
+      if (!!inputOptions.searchInput) {
+        items = await axios.get(
+          `${baseUrl}?search=${inputOptions.searchInput}`
+        );
+      }
+      setIcons(() => items.data.icons);
+    } catch (error) { }
+  }, [inputOptions.searchInput])
+
+  React.useEffect(() => {
+    searchFiles()
+  }, [inputOptions.searchInput])
 
   const throttledFetch = _.throttle(fetchFiles, 1000);
 
-  const debouncedInputChange = _.debounce((e) => {
-    inputOptions.onChangeInput(e);
-  }, 1000);
+  // const debouncedInputChange = _.debounce((e) => {
+  //   console.log("e", e)
+  //   inputOptions.onChangeInput(e);
+  // }, 1000);
 
-  React.useEffect(()=>{
-    setPage(0);
-    fetchFiles();
-  },[inputOptions.searchInput])
+  // React.useEffect(() => {
+  //   setPage(0);
+  //   fetchFiles();
+  // }, [inputOptions.searchInput])
 
   React.useEffect(() => {
     const navbar = document.querySelector(
@@ -195,6 +219,7 @@ function App() {
 
   const [loading, setLoading] = useState(false);
 
+
   const OnButtonClick = () => {
     setLoading(true);
     const timeOutFunc = () => {
@@ -220,11 +245,9 @@ function App() {
         <input
           type="text"
           className="searchInput"
-          placeholder={`Search ${
-            icons.length > 0 ? `${icons.length} icons` : ""
-          }`}
+          placeholder={`Search ${iconsCount} icons`}
           value={inputOptions.searchInput}
-          onChange={debouncedInputChange}
+          onChange={inputOptions.onChangeInput}
         />
         {!!inputOptions.searchInput && (
           <div className="searchCloseIcon">
@@ -324,7 +347,7 @@ function App() {
                 key={i.toString()}
                 name={e.name}
                 index={i}
-                url={`http://localhost:3001/static/${e.path}`}
+                url={`${baseUrl}/static/${e.path}`}
                 onItemPress={() => onItemPress(e)}
               />
             );

@@ -86,12 +86,12 @@ export const useSearch = () => {
   const onChangeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const value = event.currentTarget.value;
     setSearchInput(value);
-    // setIcons((prevIcons) => ({
-    //   ...prevIcons,
-    //   filteredIcons: prevIcons.fullIcons.filter((icon) =>
-    //     isHas(icon.name, value)
-    //   ),
-    // }));
+    setIcons((prevIcons) => ({
+      ...prevIcons,
+      filteredIcons: prevIcons.fullIcons.filter((icon) =>
+        isHas(icon.name, value)
+      ),
+    }));
   };
 
   const onClearInput = () => {
