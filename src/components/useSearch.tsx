@@ -4,6 +4,7 @@ import * as React from "react";
 interface Icon<T> {
   url: T;
   name: T;
+  path: T;
 }
 interface IconsType<T> {
   fullIcons: T[];

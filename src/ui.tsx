@@ -6,10 +6,9 @@ import "./ui.css";
 //@ts-ignore
 import { initializeApp } from "firebase/app";
 //@ts-ignore
-import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
+import { getStorage, ref } from "firebase/storage";
 //@ts-ignore
 import { Search } from "react-feather";
-import { isAbsolute } from "path/posix";
 //@ts-ignore
 import { MoreHorizontal } from "react-feather";
 //@ts-ignore
@@ -28,9 +27,12 @@ import Swal from "sweetalert2";
 import { Button } from "antd";
 //@ts-ignore
 import { useState } from "react";
-import { Filters, useFilter } from "./components/useFilter";
-import Loading from "./components/Loading/Loading";
+import InfiniteScroll from "../node_modules/react-infinite-scroll-component/dist/index";
 import IconBtn from "./components/Icon";
+import Loading from "./components/Loading/Loading";
+//@ts-ignore
+import _ from "lodash";
+
 const customStyles = {
   content: {
     width: "60%",
@@ -64,60 +66,79 @@ function App() {
   const { btnOptions, filters, inputOptions, iconOptions } = useSearch();
   const [loadingAnimate, setLoadingAnimate] = useState(false);
 
-  const getFiles = async (listRef, prefix = "") => {
-    setLoadingAnimate(true);
-    try {
-      // const pathReference = ref(storage, "activity.svg");
-      let res = await listAll(listRef);
-      if (!!res.prefixes.length) {
-        let r = res.prefixes.map((e) => {
-          let path = prefix + e._location.path;
-          return getFiles(e, path);
-        });
-        return await Promise.all(r);
-      }
-      let items = await Promise.all(
-        res.items
-          .flat()
-          .map(async (el) => {
-            return {
-              url: await getDownloadURL(el),
-              name: prefix + "/" + el.name,
-            };
-          })
-      );
-      return items;
-    } catch (error) {
-      console.log({ error });
+  const [page, setPage] = useState(0);
+
+  const [icons, setIcons] = useState([]);
+
+  // const getFiles = async (listRef, prefix = "") => {
+  //   setLoadingAnimate(true);
+  //   try {
+  //     // const pathReference = ref(storage, "activity.svg");
+  //     let res = await listAll(listRef);
+  //     if (!!res.prefixes.length) {
+  //       let r = res.prefixes.map((e) => {
+  //         let path = prefix + e._location.path;
+  //         return getFiles(e, path);
+  //       });
+  //       return await Promise.all(r);
+  //     }
+  //     let items = await Promise.all(
+  //       res.items.flat().map(async (el) => {
+  //         return {
+  //           url: await getDownloadURL(el),
+  //           name: prefix + "/" + el.name,
+  //         };
+  //       })
+  //     );
+  //     return items.slice(0, 200);
+  //   } catch (error) {
+  //     console.log({ error });
+  //   }
+  // };
+
+  React.useEffect(() => {
+    let activeFilter = filters.find((e) => e.className === "active") || "";
+    if (!!activeFilter) {
+      setPage(0);
+      setIcons([]);
+      fetchFiles();
     }
+  }, [filters]);
+
+  const fetchFiles = async () => {
+    let activeFilter = filters.find((e) => e.className === "active");
+    try {
+      let items = await axios.get(
+        `https://figma-plugin.herokuapp.com?page=${page}&pageSize=100&filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
+      );
+      setIcons((e) => [...e, ...items.data]);
+      setPage((e) => e + 1);
+    } catch (error) {}
   };
 
-  const effect = async () => {
-    try {
-      let items = (await getFiles(rootListRef)).flat(3);
-      console.log({ items });
-      iconOptions.setIcons({
-        fullIcons: items,
-        filteredIcons: items,
-      });
-      setLoadingAnimate(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const throttledFetch = _.throttle(fetchFiles, 1000);
+
+  const debouncedInputChange = _.debounce((e) => {
+    inputOptions.onChangeInput(e);
+  }, 1000);
+
+  React.useEffect(()=>{
+    setPage(0);
+    fetchFiles();
+  },[inputOptions.searchInput])
 
   React.useEffect(() => {
     const navbar = document.querySelector(
       ".header_modal--headerModalTitleWithoutOverflow--1rTCG .header_modal--headerModalTitle--8hnpX"
     ) as HTMLDivElement;
-    effect();
+
+    throttledFetch();
 
     if (navbar) {
       navbar.style.backgroundColor = "#444";
     }
   }, []);
 
-  console.log({ loadingAnimate });
   const onItemPress = async (data) => {
     let res = await axios.get(data.url);
     console.log({ res });
@@ -169,6 +190,9 @@ function App() {
       Swal.fire("Error");
     }
   }
+
+  const loader = React.useRef(null);
+
   const [loading, setLoading] = useState(false);
 
   const OnButtonClick = () => {
@@ -197,12 +221,10 @@ function App() {
           type="text"
           className="searchInput"
           placeholder={`Search ${
-            iconOptions.icons.fullIcons.length > 0
-              ? `${iconOptions.icons.fullIcons.length} icons`
-              : ""
+            icons.length > 0 ? `${icons.length} icons` : ""
           }`}
           value={inputOptions.searchInput}
-          onChange={inputOptions.onChangeInput}
+          onChange={debouncedInputChange}
         />
         {!!inputOptions.searchInput && (
           <div className="searchCloseIcon">
@@ -271,23 +293,44 @@ function App() {
           </Modal>
         </div>
       </div>
-      {loadingAnimate ? (
+      {/* {loadingAnimate ? (
         <Loading />
       ) : (
         <div className="iconsBox">
-          {iconOptions.icons.filteredIcons.map((e, i) => {
+          {icons.map((e, i) => {
             return (
               <IconBtn
                 key={i.toString()}
                 name={e.name}
                 index={i}
-                url={e.url}
+                url={`http://localhost:3001/static/${e.path}`}
                 onItemPress={() => onItemPress(e)}
               />
             );
           })}
         </div>
       )}
+      <div ref={loader}></div> */}
+      <InfiniteScroll
+        hasMore={true}
+        dataLength={icons.length}
+        loader={Loading}
+        next={throttledFetch}
+      >
+        <div className="iconsBox">
+          {icons.map((e, i) => {
+            return (
+              <IconBtn
+                key={i.toString()}
+                name={e.name}
+                index={i}
+                url={`http://localhost:3001/static/${e.path}`}
+                onItemPress={() => onItemPress(e)}
+              />
+            );
+          })}
+        </div>
+      </InfiniteScroll>
     </div>
   );
 }
