@@ -60,18 +60,19 @@ const app = initializeApp(firebaseConfig);
 const firebaseApp = app;
 const storage = getStorage(firebaseApp, "gs://icons-e8482.appspot.com");
 const rootListRef = ref(storage, "");
-const baseUrl = "https://figma-plugin.herokuapp.com"
+const baseUrl = "https://figma-plugin.herokuapp.com";
 
-const listFiles = () => { };
-
+const listFiles = () => {};
 
 // let url = "http://localhost:3001";
-let url = "https://figma-plugin.herokuapp.com"
+let url = "https://figma-plugin.herokuapp.com";
 
 function App() {
   const { btnOptions, filters, inputOptions } = useSearch();
 
   const [page, setPage] = useState(0);
+
+  const [count, setCount] = useState(0);
 
   const [icons, setIcons] = useState({ icons: [], count: 0 });
 
@@ -113,14 +114,13 @@ function App() {
   React.useEffect(() => {
     (async function () {
       try {
-        const res = await axios.get(baseUrl)
-        const count = await res.data.count
-        setIcons(icons => ({ ...icons, count }))
-      } catch (error) {
-
-      }
-    })()
-  }, [])
+        const res = await axios.get(baseUrl);
+        const count = res.data.count;
+        setIcons((icons) => ({ ...icons, count }));
+        setCount(count);
+      } catch (error) {}
+    })();
+  }, []);
 
   const fetchFiles = async () => {
     let activeFilter = filters.find((e) => e.className === "active");
@@ -130,24 +130,27 @@ function App() {
       );
       setIcons((e) => ({ ...e, icons: [...e.icons, ...items.data.icons] }));
       setPage((e) => e + 1);
-    } catch (error) { }
+    } catch (error) {}
   };
-
 
   const searchFiles = async () => {
     let activeFilter = filters.find((e) => e.className === "active");
+    if(!inputOptions.searchInput&&!activeFilter.tag){
+      fetchFiles();
+      return;
+    }
     try {
       let items = await axios.get(
-        `${baseUrl}?filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
+        `${baseUrl}?filter=${activeFilter.tag}&search=${inputOptions.searchInput}&pageSize=1000`
       );
 
-      setIcons(icons => ({ ...icons, icons: items.data.icons }));
-    } catch (error) { }
+      setIcons((icons) => ({ ...icons, icons: items.data.icons }));
+    } catch (error) {}
   };
 
   React.useEffect(() => {
-    searchFiles()
-  }, [inputOptions.searchInput, filters])
+    searchFiles();
+  }, [inputOptions.searchInput, filters]);
 
   const throttledFetch = _.throttle(fetchFiles, 1000);
 
@@ -215,9 +218,7 @@ function App() {
     }
   }
 
-
   const [loading, setLoading] = useState(false);
-
 
   const OnButtonClick = () => {
     setLoading(true);
@@ -244,7 +245,7 @@ function App() {
         <input
           type="text"
           className="searchInput"
-          placeholder={`Search ${icons.count} icons`}
+          placeholder={`Search ${count} icons`}
           value={inputOptions.searchInput}
           onChange={inputOptions.onChangeInput}
         />
@@ -335,7 +336,7 @@ function App() {
       <div ref={loader}></div> */}
       <InfiniteScroll
         hasMore={true}
-        dataLength={icons.count}
+        dataLength={icons.icons.length}
         loader={Loading}
         next={throttledFetch}
       >
