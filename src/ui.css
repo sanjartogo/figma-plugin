@@ -1,3 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500&display=swap');
+*{
+  font-family: 'Prompt', sans-serif;
+}
+
 .container {
   margin: 0 15px;
 }
@@ -195,6 +200,7 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
+  font-family: 'Prompt', sans-serif;
 }
 
 .textarea {
@@ -204,8 +210,8 @@
   border-radius: 10px;
   resize: none;
   outline: none;
-  font-family: sans-serif;
-  border: 1px splid gray;
+  border: 1px solid #E3E6EE;
+  background-color: #F7F7F7;
 }
 
 .input {
@@ -213,9 +219,10 @@
   padding: 5px;
   margin: 5px 0px;
   border: none;
-  border: 1px solid gray;
+  border: 1px solid #E3E6EE;
   outline: none;
   border-radius: 10px;
+  background-color: #F7F7F7;
 }
 
 .btnBox {
@@ -244,13 +251,13 @@
   width: 45%;
   padding: 5px 15px;
   margin: 5px 0px;
-  background-color: #E3E6EE;
+  background-color: #F7F7F7;
   cursor: pointer;
-  border: none;
+  border: 1px solid #E3E6EE;
   border-radius: 10px;
   transition: .2s ease;
 }
 
 .closeBtn:hover {
-  opacity: .7;
+  background-color: #d6d3d3
 }

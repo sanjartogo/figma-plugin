@@ -20,5 +20,24 @@ figma.ui.onmessage = (msg) => {
     figma.viewport.scrollAndZoomIntoView(nodes);
   }
 
+  if (msg.type === "on_drag") {
+    const nodes = [];
+    console.log(msg);
+
+    // for (let i = 0; i < msg.count; i++) {
+    let node = figma.createNodeFromSvg(msg.data);
+    // const rect = figma.createRectangle();
+    // rect.x = i * 150;
+    // rect.fills = [{ type: "SOLID", color: { r: 1, g: 0.5, b: 0 } }];
+    // figma.currentPage.appendChild(rect);
+    node.x = msg.position.x *  2;
+    node.y = msg.position.y * 2;
+    nodes.push(node);
+    // }
+    node.resize(24, 24);
+    figma.currentPage.selection = nodes;
+    figma.viewport.scrollAndZoomIntoView(nodes);
+  }
+
 
 };

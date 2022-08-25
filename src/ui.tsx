@@ -60,7 +60,7 @@ const app = initializeApp(firebaseConfig);
 const firebaseApp = app;
 const storage = getStorage(firebaseApp, "gs://icons-e8482.appspot.com");
 const rootListRef = ref(storage, "");
-const baseUrl = "https://figma-plugin.herokuapp.com";
+export const baseUrl = "https://figma-plugin.herokuapp.com";
 
 const listFiles = () => {};
 
@@ -167,7 +167,7 @@ function App() {
   }, []);
 
   const onItemPress = async (data) => {
-    let res = await axios.get(data.url);
+    let res = await axios.get(`${baseUrl}/static/${data.path}`);
     console.log({ res });
     parent.postMessage(
       { pluginMessage: { type: "insert_icon", data: res.data } },
@@ -282,7 +282,7 @@ function App() {
               <textarea
                 className="textarea"
                 placeholder="Send us your feedback to improve"
-                rows={8}
+                rows={5}
                 cols={50}
                 id="message"
                 name="message"

@@ -1,4 +1,6 @@
 import * as React from 'react'
+import axios from '../../node_modules/axios/index';
+import { baseUrl } from '../ui';
 
 interface IconBtnProps {
     onItemPress?: () => void;
@@ -26,8 +28,28 @@ const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
         ...renderPosition()
     }
 
+
+    const onGragHandler = async (position:{x:number; y:number;}) => {
+        let res = await axios.get(url);
+        
+        console.log({ res });
+        parent.postMessage(
+          { pluginMessage: { type: "on_drag", data: res.data, position } },
+          "*"
+        );
+      };
     return (
-        <div className="icon__box">
+        <div className="icon__box"
+        onDragStart={event => {
+           
+        }}
+        onDragEnd={(event) => {
+            onGragHandler({
+                x:event.pageX,
+                y:event.pageY
+            })
+        }}
+        >
             <img
                 onClick={() => onItemPress && onItemPress()}
                 src={url}

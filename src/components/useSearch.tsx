@@ -30,27 +30,27 @@ const initialIcons = {
 const initialFilters = [
   {
     id: 0,
-    name: "All",
-    className: "active",
-    tag: "",
-  },
-  {
-    id: 1,
     name: "Outline",
-    className: "",
+    className: "active",
     tag: "outline",
   },
   {
-    id: 2,
+    id: 1,
     name: "Doutone",
     className: "",
     tag: "bulk",
   },
   {
-    id: 3,
+    id: 2,
     name: "Filled",
     className: "",
     tag: "solid",
+  },
+  {
+    id: 3,
+    name: "All",
+    className: "",
+    tag: "",
   },
 ];
 
@@ -70,6 +70,7 @@ export const useSearch = () => {
     } else {
       filteredItems = icons.fullIcons;
     }
+    
     if (!!searchInput) {
       filteredItems = filteredItems.filter((e) => isHas(e.name, searchInput));
     }
