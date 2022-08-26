@@ -22,22 +22,34 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === "on_drag") {
     const { dropPosition, itemSize, offset, windowSize }: dropProps = msg.dropValues
+    const viewport = figma.viewport;
+    const zoom = viewport.zoom;
+    const bounds = viewport.bounds;
 
-    const bounds = figma.viewport.bounds;
+    const boundsWidth = bounds.width * zoom;
+    const boundsHeight = bounds.height * zoom;
+    const windowWidth = windowSize.width;
+    const windowHeight = windowSize.height;
 
-    const zoom = figma.viewport.zoom;
-    const hasUI = Math.round(bounds.width * zoom) !== windowSize.width;
+    const leftDiff = windowWidth - boundsWidth;
+    const topDiff = windowHeight - boundsHeight;
 
-    const leftPaneWidth = windowSize.width - bounds.width * zoom - 340;
+    const hasRightPanel = leftDiff >= 240;
+    const leftCoords = bounds.x - (leftDiff - (hasRightPanel ? 240 : 0)) / zoom;
+    const topCoords = bounds.y - topDiff / zoom;
 
-    const xFromCanvas = hasUI ? dropPosition.clientX - leftPaneWidth : dropPosition.clientX;
-    const yFromCanvas = hasUI ? dropPosition.clientY - 40 : dropPosition.clientY
+    // Target coordinates
+    let targetX = leftCoords + (dropPosition.clientX) / zoom;
+    let targetY = topCoords + (dropPosition.clientY + 24) / zoom;
+
     let node = figma.createNodeFromSvg(msg.data);
-    node.x = bounds.x + xFromCanvas / zoom - offset.x;
-    node.y = bounds.y + yFromCanvas / zoom - offset.y;
+    // node.x = Math.round(targetX);
+    // node.y = Math.round(targetY + itemSize.height);
+    node.x = Math.round(targetX - node.width / 2)
+    node.y = Math.round(targetY - node.height / 3)
     node.resize(24, 24);
     figma.currentPage.selection = [node];
-    figma.viewport.scrollAndZoomIntoView([node]);
+    // figma.viewport.scrollAndZoomIntoView([node]);
   }
 
 
