@@ -62,7 +62,7 @@ const storage = getStorage(firebaseApp, "gs://icons-e8482.appspot.com");
 const rootListRef = ref(storage, "");
 export const baseUrl = "https://figma-plugin.herokuapp.com";
 
-const listFiles = () => {};
+const listFiles = () => { };
 
 // let url = "http://localhost:3001";
 let url = "https://figma-plugin.herokuapp.com";
@@ -98,7 +98,6 @@ function App() {
   //     );
   //     return items.slice(0, 200);
   //   } catch (error) {
-  //     console.log({ error });
   //   }
   // };
 
@@ -118,7 +117,7 @@ function App() {
         const count = res.data.count;
         setIcons((icons) => ({ ...icons, count }));
         setCount(count);
-      } catch (error) {}
+      } catch (error) { }
     })();
   }, []);
 
@@ -130,12 +129,12 @@ function App() {
       );
       setIcons((e) => ({ ...e, icons: [...e.icons, ...items.data.icons] }));
       setPage((e) => e + 1);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const searchFiles = async () => {
     let activeFilter = filters.find((e) => e.className === "active");
-    if(!inputOptions.searchInput&&!activeFilter.tag){
+    if (!inputOptions.searchInput && !activeFilter.tag) {
       fetchFiles();
       return;
     }
@@ -145,7 +144,7 @@ function App() {
       );
 
       setIcons((icons) => ({ ...icons, icons: items.data.icons }));
-    } catch (error) {}
+    } catch (error) { }
   };
 
   React.useEffect(() => {
@@ -168,7 +167,6 @@ function App() {
 
   const onItemPress = async (data) => {
     let res = await axios.get(`${baseUrl}/static/${data.path}`);
-    console.log({ res });
     parent.postMessage(
       { pluginMessage: { type: "insert_icon", data: res.data } },
       "*"
@@ -251,7 +249,7 @@ function App() {
         />
         {!!inputOptions.searchInput && (
           <div className="searchCloseIcon">
-            <X onClick={inputOptions.onClearInput} />
+            <X width={"17px"} height={"17px"} onClick={inputOptions.onClearInput} />
           </div>
         )}
       </div>

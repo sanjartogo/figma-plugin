@@ -9,8 +9,33 @@ interface IconBtnProps {
     index: number;
 }
 
+export interface dropProps {
+    dropPosition: {
+        clientX: number;
+        clientY: number;
+    },
+    windowSize: {
+        width: number;
+        height: number;
+    },
+    offset: {
+        x: number;
+        y: number;
+    },
+    itemSize: {
+        width: number;
+        height: number;
+    },
+}
+
 const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
     name = name.split("/").pop().split(".svg").join("")
+
+    const [offset, setDropPosition] = React.useState({
+        x: 0,
+        y: 0
+    })
+
 
     const isRight = (index + 1) % 6 === 0
     const isLeft = index % 6 === 0;
@@ -29,28 +54,51 @@ const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
     }
 
 
-    const onGragHandler = async (position:{x:number; y:number;}) => {
+
+    const onGragHandler = async (dropValues: dropProps) => {
         let res = await axios.get(url);
-        
-        console.log({ res });
+
         parent.postMessage(
-          { pluginMessage: { type: "on_drag", data: res.data, position } },
-          "*"
+            { pluginMessage: { type: "on_drag", data: res.data, dropValues } },
+            "*"
         );
-      };
+    };
     return (
-        <div className="icon__box"
-        onDragStart={event => {
-           
-        }}
-        onDragEnd={(event) => {
-            onGragHandler({
-                x:event.pageX,
-                y:event.pageY
-            })
-        }}
-        >
+        <div className="icon__box">
             <img
+                onDragStart={event => {
+                    setDropPosition({
+                        x: event.clientX,
+                        y: event.clientY
+                    })
+                }}
+                onDragEnd={(e: React.DragEvent<HTMLDivElement>) => {
+
+                    const dropPosition = {
+                        clientX: e.clientX,
+                        clientY: e.clientY
+                    };
+
+                    // Getting the size of the app/browser window.
+                    const windowSize = {
+                        width: window.outerWidth,
+                        height: window.outerHeight
+                    };
+
+
+
+                    const itemSize = {
+                        width: e.currentTarget.clientWidth,
+                        height: e.currentTarget.clientHeight
+                    };
+
+                    onGragHandler({
+                        dropPosition,
+                        windowSize,
+                        offset,
+                        itemSize
+                    })
+                }}
                 onClick={() => onItemPress && onItemPress()}
                 src={url}
                 className="icons"

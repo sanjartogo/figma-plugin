@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500&display=swap');
-*{
+
+* {
   font-family: 'Prompt', sans-serif;
 }
 
@@ -10,34 +11,43 @@
 
 .searchInput {
   border: none;
-  font-size: 20px;
+  font-size: 14px;
   background-color: #F9F9F9;
   outline: none;
-  flex-grow: 1;
+  /* flex-grow: 1; */
+  position: relative;
+  padding-left: 11px;
+  width: 100%;
 }
 
 .searchInput::placeholder {
-  margin-left: 43.5px;
-  font-size: 16px;
+  margin-left: 60.5px;
+  font-size: 14px;
+  color: #686868;
 }
 
 .navbarInput {
   border: 1px solid #E3E6EE;
   border-radius: 10px;
-  height: 53px;
+  height: 40px;
   margin: 12px auto;
   display: flex;
   flex-direction: row;
-  gap: 13px;
   align-items: center;
   padding: 0 10px;
   background-color: #F9F9F9;
+  position: relative;
+  width: 91%;
 }
 
 .searchIcon {
-  color: #28303F;
-  width: 24px;
-  height: 24px;
+  color: #686868;
+  width: 17px;
+  height: 17px;
+  position: absolute;
+  left: 3px;
+  z-index: 2;
+
 }
 
 .navbar {
@@ -58,10 +68,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 5px 9px;
   background: #F9F9F9;
   color: #686868;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 300;
   outline: none;
   border: none;
@@ -141,8 +151,9 @@
   /* margin: 15px ; */
   overflow: hidden;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-  grid-row-gap: 4px;
+  /* grid-row-gap: 4px; */
   /* grid-column-gap: 4px; */
+  gap: 4px;
   position: relative;
   box-sizing: border-box;
   padding-bottom: 2rem;
@@ -163,8 +174,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 70px;
-  height: 69px;
+  /* width: 70px; */
+  height: 40px;
   border: 1px solid transparent;
   background-color: #F7F7F7;
 }
@@ -260,4 +271,15 @@
 
 .closeBtn:hover {
   background-color: #d6d3d3
+}
+
+body::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+
+body::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
