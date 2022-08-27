@@ -212,7 +212,7 @@
   justify-content: center;
   flex-direction: column;
   font-family: 'Prompt', sans-serif;
-  border-radius:4px;
+  border-radius: 4px;
 }
 
 .textarea {
@@ -225,7 +225,8 @@
   border: 1px solid #E3E6EE;
   background-color: #F7F7F7;
 }
-.ReactModal__Content.ReactModal__Content--after-open{
+
+.ReactModal__Content.ReactModal__Content--after-open {
   padding: 5px;
 }
 

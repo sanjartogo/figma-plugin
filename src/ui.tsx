@@ -169,7 +169,7 @@ function App() {
   const onItemPress = async (data) => {
     let res = await axios.get(`${baseUrl}/static/${data.path}`);
     parent.postMessage(
-      { pluginMessage: { type: "insert_icon", data: res.data } },
+      { pluginMessage: { type: "insert_icon", data: res.data, name: data.name } },
       "*"
     );
   };

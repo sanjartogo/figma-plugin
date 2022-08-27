@@ -1,6 +1,5 @@
-import * as React from 'react'
+import * as React from 'react';
 import axios from '../../node_modules/axios/index';
-import { baseUrl } from '../ui';
 
 interface IconBtnProps {
     onItemPress?: () => void;
@@ -28,8 +27,12 @@ export interface dropProps {
     },
 }
 
+export function refactorIconName(name: string): string {
+    return name.split("/").pop().split(".svg").join("")
+}
+
 const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
-    name = name.split("/").pop().split(".svg").join("")
+    name = refactorIconName(name)
 
     const [offset, setDropPosition] = React.useState({
         x: 0,
@@ -42,14 +45,14 @@ const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
     const isCenter = (!isRight && !isLeft)
 
     const renderPosition = () => {
-        if (isCenter) return { left: '50%' }
-        if (isRight) return { right: 0 }
-        if (isLeft) return { left: 0 }
+        if (isCenter) return { left: '50%', textAlign: "center" }
+        if (isRight) return { right: 0, textAlign: "right" }
+        if (isLeft) return { left: 0, textAlign: "left" }
     }
 
     const animatedStyle = {
         transform: `translateY(48px) translateX(${isCenter ? "-50%" : "0"})`,
-        width: `calc(${7 * name.length}px)`,
+        width: `calc(${8 * name.length}px)`,
         ...renderPosition()
     }
 
@@ -59,7 +62,7 @@ const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
         let res = await axios.get(url);
 
         parent.postMessage(
-            { pluginMessage: { type: "on_drag", data: res.data, dropValues } },
+            { pluginMessage: { type: "on_drag", data: res.data, dropValues, name } },
             "*"
         );
     };

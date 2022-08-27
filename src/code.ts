@@ -6,18 +6,16 @@ figma.ui.onmessage = (msg) => {
 
   if (msg.type === "insert_icon") {
     const nodes = [];
-
-    // for (let i = 0; i < msg.count; i++) {
     let node = figma.createNodeFromSvg(msg.data);
-    // const rect = figma.createRectangle();
-    // rect.x = i * 150;
-    // rect.fills = [{ type: "SOLID", color: { r: 1, g: 0.5, b: 0 } }];
-    // figma.currentPage.appendChild(rect);
+    node.name = msg.name.split("/").pop().split(".svg").join("")
     nodes.push(node);
-    // }
     node.resize(24, 24);
-    figma.currentPage.selection = nodes;
-    figma.viewport.scrollAndZoomIntoView(nodes);
+    const firstItem = figma.currentPage.selection[0]
+    if (firstItem) {
+      node.x = firstItem.x + 10
+      node.y = firstItem.y + 10
+    }
+    figma.currentPage.appendChild(node)
   }
 
   if (msg.type === "on_drag") {
@@ -48,8 +46,8 @@ figma.ui.onmessage = (msg) => {
     node.x = Math.round(targetX - node.width / 2)
     node.y = Math.round(targetY - node.height / 3)
     node.resize(24, 24);
+    node.name = msg.name
     figma.currentPage.selection = [node];
-    // figma.viewport.scrollAndZoomIntoView([node]);
   }
 
 
