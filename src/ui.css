@@ -5,7 +5,7 @@
 }
 
 .container {
-  margin: 0 15px;
+  margin: 0 5px;
 }
 
 
@@ -16,19 +16,19 @@
   outline: none;
   /* flex-grow: 1; */
   position: relative;
-  padding-left: 11px;
+  padding-left: 24px;
   width: 100%;
 }
 
 .searchInput::placeholder {
-  margin-left: 60.5px;
+  margin-left: 120px;
   font-size: 14px;
   color: #686868;
 }
 
 .navbarInput {
   border: 1px solid #E3E6EE;
-  border-radius: 10px;
+  border-radius: 4px;
   height: 40px;
   margin: 12px auto;
   display: flex;
@@ -45,7 +45,7 @@
   width: 17px;
   height: 17px;
   position: absolute;
-  left: 3px;
+  left: 10px;
   z-index: 2;
 
 }
@@ -212,17 +212,21 @@
   justify-content: center;
   flex-direction: column;
   font-family: 'Prompt', sans-serif;
+  border-radius:4px;
 }
 
 .textarea {
   width: 100%;
   padding: 5px;
   margin: 5px 0px;
-  border-radius: 10px;
+  border-radius: 4px;
   resize: none;
   outline: none;
   border: 1px solid #E3E6EE;
   background-color: #F7F7F7;
+}
+.ReactModal__Content.ReactModal__Content--after-open{
+  padding: 5px;
 }
 
 .input {
@@ -232,7 +236,7 @@
   border: none;
   border: 1px solid #E3E6EE;
   outline: none;
-  border-radius: 10px;
+  border-radius: 4px;
   background-color: #F7F7F7;
 }
 
@@ -249,7 +253,7 @@
   background-color: #444444;
   cursor: pointer;
   border: none;
-  border-radius: 10px;
+  border-radius: 4px;
   transition: .2s ease;
   color: white;
 }
@@ -265,7 +269,7 @@
   background-color: #F7F7F7;
   cursor: pointer;
   border: 1px solid #E3E6EE;
-  border-radius: 10px;
+  border-radius: 4px;
   transition: .2s ease;
 }
 
