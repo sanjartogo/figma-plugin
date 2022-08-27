@@ -3,6 +3,9 @@ figma.showUI(__html__, { themeColors: false, height: 500, width: 340 });
 
 
 figma.ui.onmessage = (msg) => {
+  const viewport = figma.viewport;
+  const zoom = viewport.zoom;
+  const bounds = viewport.bounds;
 
   if (msg.type === "insert_icon") {
     const nodes = [];
@@ -15,14 +18,18 @@ figma.ui.onmessage = (msg) => {
       node.x = firstItem.x + 10
       node.y = firstItem.y + 10
     }
+    else {
+      node.x = viewport.center.x
+      node.y = viewport.center.y
+    }
+
     figma.currentPage.appendChild(node)
+    figma.viewport.scrollAndZoomIntoView([node])
   }
 
   if (msg.type === "on_drag") {
     const { dropPosition, itemSize, offset, windowSize }: dropProps = msg.dropValues
-    const viewport = figma.viewport;
-    const zoom = viewport.zoom;
-    const bounds = viewport.bounds;
+
 
     const boundsWidth = bounds.width * zoom;
     const boundsHeight = bounds.height * zoom;

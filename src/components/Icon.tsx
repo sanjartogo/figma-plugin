@@ -45,14 +45,15 @@ const IconBtn: React.FC<IconBtnProps> = ({ name, url, onItemPress, index }) => {
     const isCenter = (!isRight && !isLeft)
 
     const renderPosition = () => {
-        if (isCenter) return { left: '50%', textAlign: "center" }
-        if (isRight) return { right: 0, textAlign: "right" }
-        if (isLeft) return { left: 0, textAlign: "left" }
+        if (isCenter) return { left: '50%' }
+        if (isRight) return { right: 0 }
+        if (isLeft) return { left: 0 }
     }
 
     const animatedStyle = {
         transform: `translateY(48px) translateX(${isCenter ? "-50%" : "0"})`,
         width: `calc(${8 * name.length}px)`,
+        textAlign: "center",
         ...renderPosition()
     }
 
