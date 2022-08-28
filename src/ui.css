@@ -56,6 +56,7 @@
   justify-content: space-between;
   margin: 12px 0 24px;
   align-items: center;
+  position: relative;
 }
 
 .menuItems {
@@ -96,6 +97,9 @@
   align-items: center;
   justify-content: center;
   border: 1px solid #ffff;
+  position: absolute;
+  right: 0;
+  z-index: 2;
 }
 
 .feedbackIcon:active {
@@ -281,6 +285,7 @@
 body::-webkit-scrollbar {
   -webkit-appearance: none;
   width: 7px;
+  display: none;
 }
 
 body::-webkit-scrollbar-thumb {
