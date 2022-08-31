@@ -4,35 +4,18 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "./ui.css";
 //@ts-ignore
-import { initializeApp } from "firebase/app";
-//@ts-ignore
-import { getStorage, ref } from "firebase/storage";
-//@ts-ignore
-import { Search } from "react-feather";
-//@ts-ignore
-import { MoreHorizontal } from "react-feather";
-//@ts-ignore
-import { X } from "react-feather";
+import { MoreHorizontal, Search, X } from "react-feather";
 // useSearch hook
 import { useSearch } from "./components/useSearch";
 //@ts-ignore
-import axios from "../node_modules/axios/index";
-//@ts-ignore
 import Modal from "react-modal";
-//@ts-ignore
-import emailjs from "emailjs-com";
-//@ts-ignore
-import Swal from "sweetalert2";
 //@ts-ignore
 import { Button } from "antd";
 //@ts-ignore
-import { useState } from "react";
-//@ts-ignore
-import InfiniteScroll from "../node_modules/react-infinite-scroll-component/dist/index";
+import InfiniteScroll from "react-infinite-scroll-component";
 import IconBtn from "./components/Icon";
 import Loading from "./components/Loading/Loading";
-//@ts-ignore
-import _ from "lodash";
+import { useModal } from "./components/useModal";
 
 const customStyles = {
   content: {
@@ -47,195 +30,31 @@ const customStyles = {
   },
 };
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD4Cn954HI8TQgvLAG7ldIhbYK5xE8arZ4",
-  authDomain: "icons-e8482.firebaseapp.com",
-  projectId: "icons-e8482",
-  storageBucket: "icons-e8482.appspot.com",
-  messagingSenderId: "1029364126769",
-  appId: "1:1029364126769:web:76a0e851b46047c2c37110",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const firebaseApp = app;
-const storage = getStorage(firebaseApp, "gs://icons-e8482.appspot.com");
-const rootListRef = ref(storage, "");
 export const baseUrl = "https://figma-plugin.herokuapp.com";
 
-const listFiles = () => { };
+const listFiles = () => {};
 
 // let url = "http://localhost:3001";
 let url = "https://figma-plugin.herokuapp.com";
 
 function App() {
-  const { btnOptions, filters, inputOptions } = useSearch();
-
-  const [page, setPage] = useState(0);
-
-  const [count, setCount] = useState(0);
-
-  const [icons, setIcons] = useState({ icons: [], count: 0 });
-
-  // const getFiles = async (listRef, prefix = "") => {
-  //   setLoadingAnimate(true);
-  //   try {
-  //     // const pathReference = ref(storage, "activity.svg");
-  //     let res = await listAll(listRef);
-  //     if (!!res.prefixes.length) {
-  //       let r = res.prefixes.map((e) => {
-  //         let path = prefix + e._location.path;
-  //         return getFiles(e, path);
-  //       });
-  //       return await Promise.all(r);
-  //     }
-  //     let items = await Promise.all(
-  //       res.items.flat().map(async (el) => {
-  //         return {
-  //           url: await getDownloadURL(el),
-  //           name: prefix + "/" + el.name,
-  //         };
-  //       })
-  //     );
-  //     return items.slice(0, 200);
-  //   } catch (error) {
-  //   }
-  // };
-
-  React.useEffect(() => {
-    let activeFilter = filters.find((e) => e.className === "active") || "";
-    if (!!activeFilter) {
-      setPage(0);
-      setIcons({ icons: [], count: 0 });
-      fetchFiles();
-    }
-  }, [filters]);
-
-  React.useEffect(() => {
-    (async function () {
-      try {
-        const res = await axios.get(baseUrl);
-        const count = res.data.count;
-        setIcons((icons) => ({ ...icons, count }));
-        setCount(count);
-      } catch (error) { }
-    })();
-  }, []);
-
-  const fetchFiles = async () => {
-    let activeFilter = filters.find((e) => e.className === "active");
-    try {
-      let items = await axios.get(
-        `${baseUrl}?page=${page}&pageSize=100&filter=${activeFilter.tag}&search=${inputOptions.searchInput}`
-      );
-      setIcons((e) => ({ ...e, icons: [...e.icons, ...items.data.icons] }));
-      setPage((e) => e + 1);
-    } catch (error) { }
-  };
-
-  const searchFiles = async () => {
-    let activeFilter = filters.find((e) => e.className === "active");
-    if (!inputOptions.searchInput && !activeFilter.tag) {
-      fetchFiles();
-      return;
-    }
-    try {
-      let items = await axios.get(
-        `${baseUrl}?filter=${activeFilter.tag}&search=${inputOptions.searchInput}&pageSize=1000`
-      );
-
-      setIcons((icons) => ({ ...icons, icons: items.data.icons }));
-    } catch (error) { }
-  };
-
-  React.useEffect(() => {
-    searchFiles();
-  }, [inputOptions.searchInput, filters]);
-
-  const throttledFetch = _.throttle(fetchFiles, 1000);
-
-  React.useEffect(() => {
-    const navbar = document.querySelector(
-      ".header_modal--headerModalTitleWithoutOverflow--1rTCG .header_modal--headerModalTitle--8hnpX"
-    ) as HTMLDivElement;
-
-    throttledFetch();
-
-    if (navbar) {
-      navbar.style.backgroundColor = "#444";
-    }
-  }, []);
-
-  const onItemPress = async (data) => {
-    let res = await axios.get(`${baseUrl}/static/${data.path}`);
-    parent.postMessage(
-      { pluginMessage: { type: "insert_icon", data: res.data, name: data.name } },
-      "*"
-    );
-  };
-
-  let subtitle;
-  const [modalIsOpen, setIsOpen] = React.useState(false);
-
-  function openModal() {
-    setIsOpen(true);
-  }
-
-  function closeModal() {
-    setIsOpen(false);
-  }
-
-  function afterOpenModal() {
-    // references are now sync'd and can be accessed.
-    subtitle.style.color = "#f00";
-  }
-
-  const [message, setMessage] = useState("");
-  const [email, setEmail] = useState("");
-
-  async function SendMessage(e: { preventDefault: () => void }) {
-    e.preventDefault();
-
-    if (!(message && email)) return;
-
-    try {
-      const data = await emailjs.sendForm(
-        "service_w62mxye",
-        "template_kca82ts",
-        //@ts-ignore
-        e.target,
-        "MRw0SKfM-RnYWqYjk"
-      );
-      const status = await data.status;
-      if (status === 200) {
-        Swal.fire("Succes");
-        setMessage("");
-        setEmail("");
-      }
-    } catch (error) {
-      Swal.fire("Error");
-    }
-  }
-
-  const [loading, setLoading] = useState(false);
-
-  const OnButtonClick = () => {
-    setLoading(true);
-    const timeOutFunc = () => {
-      setLoading(false);
-    };
-    setTimeout(timeOutFunc, 3000);
-    clearTimeout(3000);
-  };
-
-  const onChangeHandler = (
-    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = event.currentTarget;
-
-    if (name === "email") setEmail(value);
-    if (name === "message") setMessage(value);
-  };
+  const {
+    btnOptions,
+    filters,
+    inputOptions,
+    count,
+    icons,
+    sendEmail,
+    email,
+    message,
+    OnButtonClick,
+    onChangeHandler,
+    throttledFetch,
+    loading,
+    onItemPress,
+    inputRef,
+  } = useSearch();
+  const { closeModal, modalIsOpen, openModal, afterOpenModal } = useModal();
 
   return (
     <div className="container">
@@ -245,12 +64,16 @@ function App() {
           type="text"
           className="searchInput"
           placeholder={`Search ${count} icons`}
-          value={inputOptions.searchInput}
           onChange={inputOptions.onChangeInput}
+          ref={inputRef}
         />
         {!!inputOptions.searchInput && (
           <div className="searchCloseIcon">
-            <X width={"17px"} height={"17px"} onClick={inputOptions.onClearInput} />
+            <X
+              width={"17px"}
+              height={"17px"}
+              onClick={inputOptions.onClearInput}
+            />
           </div>
         )}
       </div>
@@ -277,7 +100,7 @@ function App() {
             style={customStyles}
             contentLabel="Example Modal"
           >
-            <form className="sendMessage" onSubmit={SendMessage}>
+            <form className="sendMessage" onSubmit={sendEmail}>
               <textarea
                 className="textarea"
                 placeholder="Send us your feedback to improve"
@@ -336,8 +159,9 @@ function App() {
       <InfiniteScroll
         hasMore={true}
         dataLength={icons.icons.length}
-        loader={Loading}
+        loader={<Loading />}
         next={throttledFetch}
+        scrollThreshold={1}
       >
         <div className="iconsBox">
           {icons.icons.map((e, i) => {
@@ -352,6 +176,7 @@ function App() {
             );
           })}
         </div>
+        {loading && <Loading />}
       </InfiniteScroll>
     </div>
   );

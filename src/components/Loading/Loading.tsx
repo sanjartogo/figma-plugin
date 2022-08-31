@@ -9,6 +9,5 @@ export default () => (
         <div className="loading-content">
             <Lottie animationData={loading} loop={true} />
         </div>
-            <p className="loading__title">Loading 4077 icons please wait...</p>
     </div>
 )
