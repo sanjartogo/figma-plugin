@@ -79,17 +79,21 @@ export const useSearch = () => {
 
   React.useEffect(() => {
     let activeFilter = filters.find((e) => e.className === "active") || "";
-    console.log({ activeFilter });
+    console.log({ activeFilter }, '82');
 
     //@ts-ignore
     if (!searchInput && !activeFilter.tag) {
+      setPage(0);
+      setIcons({ icons: [], count: 0 });
+      throttledFetch();
       return;
     }
-    console.log("SEARCHING FILES");
     if (!!activeFilter) {
       setPage(0);
       setIcons({ icons: [], count: 0 });
       throttledFetch();
+    console.log("SEARCHING FILES", '94');
+
     }
   }, [filters]);
 
@@ -98,9 +102,9 @@ export const useSearch = () => {
       try {
         const res = await axios.get(baseUrl);
         const count = res.data.count;
-        setLoading(true);
         setIcons((icons) => ({ ...icons, count }));
         setCount(count);
+          setLoading(true)
       } catch (error) {}
     })();
   }, []);
@@ -109,13 +113,14 @@ export const useSearch = () => {
 
   const fetchFiles = async () => {
     setLoading(true);
-    console.log("FETCHING FILES");
+    console.log("FETCHING FILES", '112');
 
     let activeFilter = filters.find((e) => e.className === "active");
     try {
       let items = await axios.get(
-        `${baseUrl}?page=${page}&pageSize=28&filter=${activeFilter.tag}&search=${searchInput}`
+        `${baseUrl}?page=${page}&pageSize=51&filter=${activeFilter.tag}&search=${searchInput}`
       );
+      setLoading(true)
       setTimeout(() => {
         setIcons((e) => ({ ...e, icons: [...e.icons, ...items.data.icons] }));
         setPage((e) => e + 1);
