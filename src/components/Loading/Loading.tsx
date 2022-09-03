@@ -11,3 +11,5 @@ export default () => (
         </div>
     </div>
 )
+
+export { loading as loadingJsonFile }

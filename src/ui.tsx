@@ -5,6 +5,8 @@ import * as ReactDOM from "react-dom";
 import "./ui.css";
 //@ts-ignore
 import { MoreHorizontal, Search, X } from "react-feather";
+//@ts-ignore
+import Lottie from "lottie-react";
 // useSearch hook
 import { useSearch } from "./components/useSearch";
 //@ts-ignore
@@ -14,7 +16,7 @@ import { Button } from "antd";
 //@ts-ignore
 import InfiniteScroll from "react-infinite-scroll-component";
 import IconBtn from "./components/Icon";
-import Loading from "./components/Loading/Loading";
+import Loading, { loadingJsonFile } from "./components/Loading/Loading";
 import { useModal } from "./components/useModal";
 
 const customStyles = {
@@ -32,7 +34,7 @@ const customStyles = {
 
 export const baseUrl = "https://figma-plugin.herokuapp.com";
 
-const listFiles = () => {};
+const listFiles = () => { };
 
 // let url = "http://localhost:3001";
 let url = "https://figma-plugin.herokuapp.com";
@@ -65,6 +67,7 @@ function App() {
           className="searchInput"
           placeholder={`Search ${count} icons`}
           onChange={inputOptions.onChangeInput}
+          value={inputOptions.searchInput}
           ref={inputRef}
         />
         {!!inputOptions.searchInput && (
@@ -159,7 +162,23 @@ function App() {
       <InfiniteScroll
         hasMore={true}
         dataLength={icons.icons.length}
-        loader={<Loading />}
+        loader={
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 20
+            }}
+          >
+            <div className="loading-content">
+              <Lottie
+                animationData={loadingJsonFile}
+                loop={true}
+              />
+            </div>
+          </div>
+        }
         next={throttledFetch}
         scrollThreshold={1}
       >
